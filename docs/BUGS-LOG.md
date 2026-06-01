@@ -7,6 +7,30 @@
 
 ---
 
+## v3.6.1 (2026-05-29 · Hermes Skills Guard 假阳性绕过 · issue #66)
+
+### BUG · `hermes skills install` 报 DANGEROUS · `--force` 覆盖不了
+
+- **症状**：用户 @zodiacg ([#66](https://github.com/wbh604/UZI-Skill/issues/66)) 反馈 `hermes skills install wbh604/UZI-Skill/skills/deep-analysis` 失败 · scanner 168 findings · DANGEROUS verdict
+- **位置**：Hermes Skills Guard 模式匹配扫描器（NousResearch/hermes-agent · 上游 bug · 不是 UZI-Skill 的问题）
+- **根因**：Skills Guard 是 v0.x 纯模式匹配 (`r'os\.environ\b'`) · 不区分"读自己配置"vs"窃取用户敏感 env" · 也不识别 docstring / HTML 注释 / opt-in 用户功能
+- **影响**：community 源任何 finding 都会 BLOCK · `--force` 设计上不能覆盖 DANGEROUS · 用户 Hub 装不下来
+- **修法**：提供 `install-hermes.sh` 一键脚本 · `git clone + ln -sfn` 到 `~/.hermes/skills/` · 跳过 Hub quarantine 扫描 · Hermes 跑时只看目录 layout · 完全等价
+- **绝不能做的事**：
+  - ❌ 用 dynamic import + 字符串拼接绕 Skills Guard 检测（这是上游 issue #7072 提到的恶意绕过 · 我们绝不走这条路 · 那是窃取信任模型）
+  - ❌ 删除合法的 `os.environ.get` 代码来降 findings · 那是把功能砍了
+  - ✅ 只提供 clone+symlink 路径 · 用户主动决定信任我们 · 而不是欺骗 Hub 让它判 "safe"
+- **验证**：
+  - `bash install-hermes.sh` 在干净环境跑通 · 4 个 skill symlink + venv pip 装包 + SKILL.md 版本验证
+  - 11 个回归测试 (`test_v3_6_1_install_hermes.py`)
+- **未来改该区域注意事项**：
+  - 若 Hermes Skills Guard 升级到 allowlist 模型 · `hermes skills install` 重新可用时 · 在 INSTALL-HERMES.md 顶部加 "Skills Guard 已修 · 直接 hub 装" 提示
+  - 但 install-hermes.sh 应该保留作为 dev 路径（clone + symlink 让 git pull 立刻生效 · Hub 装是 snapshot）
+  - 改 skill 目录结构时 · 必须同步更新脚本里的 `SKILLS=(deep-analysis ...)` 数组
+  - 永远不要"为了 Skills Guard 评分好看"砍合法功能 · `--remote` cloudflared 是用户主动 opt-in · 默认不跑
+
+---
+
 ## v3.6.0 (2026-05-29 · 视觉升级 + 多股对比 + 组合分析)
 
 ### FEATURE A1 · 暗色模式 toggle
