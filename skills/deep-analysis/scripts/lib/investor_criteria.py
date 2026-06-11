@@ -1052,6 +1052,43 @@ SAYLOR_RULES = [
 ]
 
 
+# ─── F 派新增 (v3.9.0) · 股海贼王 · 淘股吧十年实盘蒸馏 ─────────
+# 规则阈值全部来自其真实数据 (docs/ghzw-dossier.md)：
+#   8951 笔交割单 (2016-02 → 2026-06 · 33 万 → 3131 万 · ~95 倍)
+#   持仓中位 1 天 / P75 3 天 · 同时持仓 3-5 只 · 第一重仓中位 51%
+#   10 年 2010 只票 · 题材主线轮动 (鸿博/川能/人民网/大众交通/海德)
+# 哲学 (5069 条发言)："涨停的股为啥涨停 · 在板块什么地位 · 在大盘什么地位" ·
+# "逻辑硬的低位票爆发力足" · "弱转强快速板才是超预期" · 格局票当"时代的情绪载体"
+
+GHZW_RULES = [
+    Rule("mainline_theme", "题材主线确认（板块热度+催化）", 5,
+         check=lambda f: f.get("has_positive_catalyst", False) and f.get("sentiment_heat", 0) >= 55,
+         pass_msg="主线题材+催化齐备 · 热度 {sentiment_heat:.0f} · 复盘三问能答上",
+         fail_msg="不在当前主线上 · 没有题材催化 · 我只做主线（10 年 2010 只票全是轮动出来的）"),
+    Rule("limit_up_gene", "涨停基因 / 龙虎活跃", 4,
+         check=lambda f: f.get("lhb_30d_count", 0) >= 1 or f.get("has_limit_up_recent", False),
+         pass_msg="近 30 天龙虎/涨停活跃 {lhb_30d_count:.0f} 次 · 有接力土壤",
+         fail_msg="无涨停基因 · 接力没有抓手"),
+    Rule("strong_tape", "盘口强度（Stage 2 + 量能配合）", 4,
+         check=lambda f: f.get("stage_num") == 2 and f.get("vol_amplified", True),
+         pass_msg="Stage 2 + 承接好 · 平盘就敢干",
+         fail_msg="盘口不强 · 弱转强没确认 · 等盘面给答案"),
+    Rule("low_position_logic", "逻辑硬的低位票", 3,
+         check=lambda f: f.get("pct_from_year_high", 0) < -25 and f.get("has_positive_catalyst", False),
+         pass_msg="距年高 {pct_from_year_high:.0f}% · 低位+逻辑硬=爆发力足（清水源/冀中能源式补涨）",
+         fail_msg="位置不低或逻辑不硬 · 高位接力六分之一概率不满仓搞"),
+    Rule("era_carrier", "时代情绪载体（格局票判定）", 3,
+         check=lambda f: any(k in (str(f.get("industry","")) + str(f.get("name",""))) for k in
+                             ("AI", "人工智能", "机器人", "无人驾驶", "智能驾驶", "算力", "半导体", "低空", "固态电池")),
+         pass_msg="{industry} · 时代性题材 · 能看三五倍的票为什么恐高 为什么不格局",
+         fail_msg="非时代级题材 · 做短可以 · 谈不上格局"),
+    Rule("liquidity_exit", "流动性可进出（成交活跃）", 2,
+         check=lambda f: f.get("sentiment_heat", 0) >= 40 or f.get("lhb_30d_count", 0) >= 1,
+         pass_msg="成交活跃 · 出得来货",
+         fail_msg="流动性差 · 第一重仓常打五成 · 出不来货的票不碰"),
+]
+
+
 # ═══════════════════════════════════════════════════════════════
 # MASTER REGISTRY
 # ═══════════════════════════════════════════════════════════════
@@ -1097,6 +1134,7 @@ INVESTOR_RULES: dict[str, list[Rule]] = {
     "zhang_lei": ZHANG_LEI_RULES,
     # Group F · 游资 (from YOUZI_RULES_MAP)
     **YOUZI_RULES_MAP,
+    "ghzw": GHZW_RULES,  # v3.9.0 · 股海贼王 · 淘股吧十年实盘蒸馏 (规则阈值来自真实交割单)
     # Group G · Quant (+1 AQR · v3.7.0)
     "simons": SIMONS_RULES,
     "thorp": THORP_RULES,

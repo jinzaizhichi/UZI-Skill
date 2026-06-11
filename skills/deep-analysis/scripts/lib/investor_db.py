@@ -79,6 +79,9 @@ INVESTORS = [
     {"id": "bj_cj",      "name": "北京炒家",   "group": "F", "tier": "new_2025","fields": ["2_kline", "15_events", "16_lhb"], "avatar_seed": "BJCJ-Boss"},
     {"id": "wang_zr",    "name": "瑞鹤仙",     "group": "F", "tier": "new_2025","fields": ["2_kline", "16_lhb"], "avatar_seed": "RuiHe-Crane"},
     {"id": "xin_dd",     "name": "鑫多多",     "group": "F", "tier": "new_2025","fields": ["2_kline", "15_events", "16_lhb"], "avatar_seed": "XinDD-Star"},
+    # v3.9.0 · 股海贼王 · 淘股吧十年实盘 (2016-02 起 · 33 万→3000 万+) · 从其 8951 笔
+    # 真实交易流水 + 5069 条发言蒸馏 (docs/ghzw-dossier.md) · 超短接力 + 题材主线 + 格局票
+    {"id": "ghzw",       "name": "股海贼王",   "group": "F", "tier": "flagship","fields": ["2_kline", "15_events", "16_lhb", "7_industry", "17_sentiment"], "source": "淘股吧十年实盘帖 · 8951 笔交割单蒸馏", "avatar_seed": "GHZW-Pirate"},
 
     # ──────────── G: 量化系统派 ────────────
     {"id": "simons",    "name": "西蒙斯",     "en": "Jim Simons",         "group": "G", "fields": ["2_kline", "9_futures"], "source": "The Man Who Solved the Market", "avatar_seed": "Simons-Beard"},
@@ -114,7 +117,7 @@ def all_ids() -> list[str]:
 
 
 def assert_count() -> None:
-    expected = 65  # v3.7.0 · 52 + 13 new tech tycoons (B+5 / C+2 / E+1 / G+1 / H+4)
+    expected = 66  # v3.9.0 · 65 + 股海贼王 (F 组第 24 人 · 淘股吧十年实盘蒸馏)
     assert len(INVESTORS) == expected, f"Expected {expected} investors, got {len(INVESTORS)}"
 
 
